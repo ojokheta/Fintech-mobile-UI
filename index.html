@@ -1,0 +1,1994 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>G02bank — Mobile Banking</title>
+    <meta name="description" content="G02bank mobile banking interface." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #f3f5f9;
+        --surface: #ffffff;
+        --ink: #101828;
+        --ink-2: #475467;
+        --ink-3: #98a2b3;
+        --line: #e7ebf2;
+        --line-2: #eef1f6;
+
+        --brand: #0e9f6e;
+        --brand-deep: #0b8f63;
+        --brand-ink: #067a54;
+        --brand-tint: rgba(14, 159, 110, 0.1);
+        --brand-line: rgba(14, 159, 110, 0.32);
+        --ring: rgba(14, 159, 110, 0.18);
+
+        --indigo: #4f5dff;
+        --good: #0b8f63;
+        --bad: #e5484d;
+        --good-tint: rgba(11, 143, 99, 0.12);
+        --bad-tint: rgba(229, 72, 77, 0.12);
+
+        --navy: #0a1f2b;
+
+        --r-xl: 26px;
+        --r-lg: 20px;
+        --r-md: 14px;
+        --r-sm: 10px;
+
+        --sh-sm: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.07);
+        --sh-md: 0 12px 32px -12px rgba(16, 24, 40, 0.18);
+        --sh-hero: 0 24px 48px -18px rgba(9, 53, 42, 0.55);
+
+        --font-display: "Sora", Inter, system-ui, sans-serif;
+        --font-body: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        font-family: var(--font-body);
+        color: var(--ink);
+        background: var(--bg);
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .mesh {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(640px 420px at 6% -8%, rgba(14, 159, 110, 0.16), transparent 60%),
+          radial-gradient(560px 440px at 98% -4%, rgba(79, 93, 255, 0.13), transparent 55%),
+          radial-gradient(760px 540px at 50% 112%, rgba(14, 159, 110, 0.1), transparent 62%);
+      }
+
+      .shell {
+        position: relative;
+        width: min(480px, 100%);
+        margin: 0 auto;
+        min-height: 100dvh;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+      }
+      @media (min-width: 560px) {
+        .shell {
+          border-left: 1px solid var(--line);
+          border-right: 1px solid var(--line);
+          background: rgba(255, 255, 255, 0.35);
+        }
+      }
+
+      .display {
+        font-family: var(--font-display);
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* ---------- App bar ---------- */
+      .appbar {
+        padding: 18px 18px 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .who {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+      }
+      .avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 15px;
+        flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 15px;
+        letter-spacing: 0.4px;
+        background: linear-gradient(135deg, #10b981, #067a54);
+        box-shadow: 0 8px 18px -6px rgba(6, 122, 84, 0.5);
+      }
+      .hello {
+        min-width: 0;
+      }
+      .hello .greet {
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 16px;
+        letter-spacing: 0.1px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .hello .small {
+        margin-top: 2px;
+        font-size: 12px;
+        color: var(--ink-3);
+      }
+      .iconbtn {
+        width: 40px;
+        height: 40px;
+        flex: 0 0 auto;
+        border-radius: 13px;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--ink-2);
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        box-shadow: var(--sh-sm);
+        transition: transform 0.14s ease, background 0.18s ease, color 0.18s ease;
+        user-select: none;
+      }
+      .iconbtn:hover {
+        transform: translateY(-1px);
+        color: var(--ink);
+      }
+      .iconbtn:active {
+        transform: translateY(0) scale(0.98);
+      }
+
+      /* ---------- Pages ---------- */
+      .pages {
+        padding: 4px 18px 20px;
+      }
+      .page {
+        display: none;
+        animation: liftIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      }
+      .page.active {
+        display: block;
+      }
+
+      .section-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin: 20px 2px 10px;
+      }
+      .section-head h3 {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 0.1px;
+      }
+      .link {
+        background: none;
+        border: none;
+        padding: 0;
+        font: inherit;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--brand-deep);
+        cursor: pointer;
+      }
+      .link:hover {
+        text-decoration: underline;
+      }
+
+      /* ---------- Hero balance card ---------- */
+      .hero {
+        position: relative;
+        overflow: hidden;
+        border-radius: var(--r-xl);
+        padding: 20px;
+        color: #fff;
+        background: linear-gradient(135deg, #0a1f2b 0%, #0d3534 58%, #0e5c46 100%);
+        box-shadow: var(--sh-hero);
+      }
+      .hero::before {
+        content: "";
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        right: -110px;
+        top: -140px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 35% 35%, rgba(45, 212, 191, 0.35), transparent 62%);
+      }
+      .hero::after {
+        content: "";
+        position: absolute;
+        width: 220px;
+        height: 220px;
+        left: -90px;
+        bottom: -120px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 60% 40%, rgba(16, 185, 129, 0.28), transparent 60%);
+      }
+      .hero > * {
+        position: relative;
+        z-index: 1;
+      }
+      .hero-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .hero-label {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.62);
+      }
+      .hero-eyebtn {
+        width: 34px;
+        height: 34px;
+        border-radius: 11px;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.9);
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        transition: background 0.18s ease, transform 0.14s ease;
+      }
+      .hero-eyebtn:hover {
+        background: rgba(255, 255, 255, 0.18);
+        transform: translateY(-1px);
+      }
+      .hero-amt {
+        margin-top: 10px;
+        font-family: var(--font-display);
+        font-weight: 800;
+        font-size: 34px;
+        letter-spacing: 0.3px;
+        font-variant-numeric: tabular-nums;
+      }
+      .hero-meta {
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .hero-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 6px 11px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.08);
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.88);
+        font-variant-numeric: tabular-nums;
+      }
+      .hero-chip .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #2dd4bf;
+        box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.25);
+      }
+      .hero-spark {
+        margin-top: 14px;
+        display: block;
+        width: 100%;
+        height: 54px;
+        opacity: 0.95;
+      }
+
+      /* ---------- Quick actions ---------- */
+      .quick {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-top: 14px;
+      }
+      .qbtn {
+        border: 1px solid var(--line);
+        background: var(--surface);
+        border-radius: var(--r-lg);
+        padding: 13px 8px 11px;
+        text-align: center;
+        cursor: pointer;
+        user-select: none;
+        box-shadow: var(--sh-sm);
+        transition: transform 0.14s ease, box-shadow 0.18s ease;
+      }
+      .qbtn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--sh-md);
+      }
+      .qbtn:active {
+        transform: translateY(0) scale(0.98);
+      }
+      .qicon {
+        width: 38px;
+        height: 38px;
+        margin: 0 auto 8px;
+        border-radius: 13px;
+        display: grid;
+        place-items: center;
+      }
+      .t-brand {
+        background: var(--brand-tint);
+        color: var(--brand-ink);
+      }
+      .t-indigo {
+        background: rgba(79, 93, 255, 0.11);
+        color: var(--indigo);
+      }
+      .t-amber {
+        background: rgba(217, 119, 6, 0.12);
+        color: #b45309;
+      }
+      .t-sky {
+        background: rgba(2, 132, 199, 0.11);
+        color: #0369a1;
+      }
+      .qtxt {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--ink-2);
+      }
+
+      /* ---------- Cards / surfaces ---------- */
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-xl);
+        box-shadow: var(--sh-sm);
+        padding: 16px;
+      }
+
+      /* ---------- Transaction list ---------- */
+      .list {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-lg);
+        box-shadow: var(--sh-sm);
+        overflow: hidden;
+      }
+      .item {
+        display: grid;
+        grid-template-columns: 42px 1fr auto;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+      }
+      .item + .item {
+        border-top: 1px solid var(--line-2);
+      }
+      .item.btnlike {
+        cursor: pointer;
+        user-select: none;
+        transition: background 0.15s ease;
+      }
+      .item.btnlike:hover {
+        background: #f8fafc;
+      }
+      .item.btnlike:active {
+        background: #f1f5f9;
+      }
+      .iicon {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: var(--line-2);
+        color: var(--ink-2);
+      }
+      .iicon.in {
+        background: var(--good-tint);
+        color: var(--good);
+      }
+      .iicon.out {
+        background: var(--bad-tint);
+        color: var(--bad);
+      }
+      .idesc {
+        min-width: 0;
+      }
+      .idesc .name {
+        font-weight: 600;
+        font-size: 14px;
+        letter-spacing: 0.1px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .idesc .meta {
+        margin-top: 2px;
+        font-size: 12px;
+        color: var(--ink-3);
+      }
+      .iamt {
+        text-align: right;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        font-size: 14px;
+      }
+      .iamt.in {
+        color: var(--good);
+      }
+      .iamt.out {
+        color: var(--ink);
+      }
+      .empty {
+        padding: 28px 16px;
+        text-align: center;
+        color: var(--ink-3);
+        font-size: 13px;
+      }
+
+      /* ---------- Filters / pills / search ---------- */
+      .filters {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+      .pill {
+        padding: 8px 13px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--ink-2);
+        font-size: 12.5px;
+        font-weight: 600;
+        cursor: pointer;
+        user-select: none;
+        transition: transform 0.14s ease, background 0.18s ease, color 0.18s ease,
+          border-color 0.18s ease;
+      }
+      .pill:hover {
+        transform: translateY(-1px);
+      }
+      .pill.active {
+        background: var(--brand-tint);
+        border-color: var(--brand-line);
+        color: var(--brand-ink);
+      }
+      .search {
+        position: relative;
+        flex: 1;
+        min-width: 130px;
+      }
+      .search svg {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--ink-3);
+        pointer-events: none;
+      }
+      .search input {
+        padding-left: 38px;
+      }
+
+      .pager {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        justify-content: flex-end;
+        margin-top: 12px;
+      }
+      .pager .muted {
+        font-size: 12.5px;
+      }
+
+      /* ---------- Inputs & buttons ---------- */
+      .input {
+        width: 100%;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        color: var(--ink);
+        padding: 12px 14px;
+        border-radius: var(--r-md);
+        font: inherit;
+        outline: none;
+        box-shadow: var(--sh-sm);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      }
+      .input::placeholder {
+        color: var(--ink-3);
+      }
+      .input:focus {
+        border-color: var(--brand);
+        box-shadow: 0 0 0 4px var(--ring);
+      }
+
+      .btn {
+        appearance: none;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--ink);
+        padding: 11px 16px;
+        border-radius: 13px;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: var(--sh-sm);
+        transition: transform 0.14s ease, box-shadow 0.18s ease, background 0.18s ease,
+          color 0.18s ease;
+        user-select: none;
+      }
+      .btn:hover {
+        transform: translateY(-1px);
+      }
+      .btn:active {
+        transform: translateY(0) scale(0.99);
+      }
+      .btn.primary {
+        border: none;
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: #fff;
+        box-shadow: 0 12px 24px -10px rgba(5, 150, 105, 0.55);
+      }
+      .btn.primary:hover {
+        box-shadow: 0 16px 28px -10px rgba(5, 150, 105, 0.6);
+      }
+      .btn.ghost {
+        box-shadow: none;
+        background: transparent;
+        border-color: transparent;
+        color: var(--ink-2);
+      }
+      .btn.ghost:hover {
+        background: var(--line-2);
+        color: var(--ink);
+      }
+      .btn.danger-ghost {
+        box-shadow: none;
+        background: var(--bad-tint);
+        border-color: rgba(229, 72, 77, 0.25);
+        color: var(--bad);
+      }
+      .btn.wide {
+        width: 100%;
+      }
+      .btn.sm {
+        padding: 8px 12px;
+        border-radius: 11px;
+        font-size: 13px;
+        box-shadow: none;
+      }
+
+      .money {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        padding: 0 14px;
+        box-shadow: var(--sh-sm);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      }
+      .money:focus-within {
+        border-color: var(--brand);
+        box-shadow: 0 0 0 4px var(--ring);
+      }
+      .money .cur {
+        color: var(--ink-3);
+        font-weight: 600;
+      }
+      .money input {
+        border: none;
+        box-shadow: none;
+        padding: 12px 0;
+        background: transparent;
+      }
+      .money input:focus {
+        box-shadow: none;
+      }
+
+      .chips {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .chip {
+        padding: 7px 12px;
+        border-radius: 999px;
+        border: 1px dashed var(--line);
+        background: #fbfcfe;
+        color: var(--ink-2);
+        font-size: 12.5px;
+        font-weight: 600;
+        cursor: pointer;
+        user-select: none;
+        transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease;
+      }
+      .chip:hover {
+        border-color: var(--brand-line);
+        color: var(--brand-ink);
+        background: var(--brand-tint);
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        background: var(--line-2);
+        color: var(--ink-2);
+      }
+      .badge.brand {
+        background: var(--brand-tint);
+        color: var(--brand-ink);
+      }
+
+      /* ---------- Key-value rows ---------- */
+      .kv {
+        display: grid;
+        gap: 8px;
+      }
+      .kvrow {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        border-radius: var(--r-md);
+        border: 1px solid var(--line);
+        background: #fbfcfe;
+      }
+      .kvrow .k {
+        color: var(--ink-2);
+        font-size: 13px;
+      }
+      .kvrow .v {
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        text-align: right;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      /* ---------- Settings rows ---------- */
+      .rows {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-lg);
+        box-shadow: var(--sh-sm);
+        overflow: hidden;
+      }
+      .row-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px;
+      }
+      .row-item + .row-item {
+        border-top: 1px solid var(--line-2);
+      }
+      .row-item .ri-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        background: var(--line-2);
+        color: var(--ink-2);
+        flex: 0 0 auto;
+      }
+      .row-item .ri-icon.t-brand {
+        background: var(--brand-tint);
+        color: var(--brand-ink);
+      }
+      .row-item .ri-icon.t-indigo {
+        background: rgba(79, 93, 255, 0.11);
+        color: var(--indigo);
+      }
+      .row-item .ri-icon.t-amber {
+        background: rgba(217, 119, 6, 0.12);
+        color: #b45309;
+      }
+      .row-item .ri-main {
+        flex: 1;
+        min-width: 0;
+      }
+      .row-item .ri-title {
+        font-weight: 600;
+        font-size: 14px;
+      }
+      .row-item .ri-sub {
+        margin-top: 2px;
+        font-size: 12px;
+        color: var(--ink-3);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .row-item .chev {
+        color: var(--ink-3);
+      }
+
+      /* ---------- Bank card visual ---------- */
+      .bankcard {
+        position: relative;
+        overflow: hidden;
+        border-radius: var(--r-xl);
+        padding: 20px;
+        color: #fff;
+        background: linear-gradient(130deg, #0b2b3c 0%, #0e4d5c 52%, #0f8a6a 100%);
+        box-shadow: 0 24px 44px -18px rgba(9, 63, 55, 0.55);
+        transition: filter 0.35s ease;
+      }
+      .bankcard::before {
+        content: "";
+        position: absolute;
+        width: 260px;
+        height: 260px;
+        right: -90px;
+        top: -120px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 35% 35%, rgba(94, 234, 212, 0.32), transparent 62%);
+      }
+      .bankcard > * {
+        position: relative;
+        z-index: 1;
+      }
+      .bankcard.frozen {
+        filter: grayscale(0.85) brightness(1.04);
+      }
+      .bc-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+      .bc-chip {
+        width: 40px;
+        height: 30px;
+        border-radius: 7px;
+        background: linear-gradient(135deg, #f5d67b, #c9962e);
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+      }
+      .bc-num {
+        margin-top: 26px;
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 20px;
+        letter-spacing: 3px;
+        font-variant-numeric: tabular-nums;
+      }
+      .bc-bottom {
+        margin-top: 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 10px;
+      }
+      .bc-label {
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.55);
+      }
+      .bc-value {
+        margin-top: 3px;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+      }
+      .bc-visa {
+        font-family: var(--font-display);
+        font-weight: 800;
+        font-style: italic;
+        font-size: 17px;
+        letter-spacing: 0.5px;
+      }
+      .bc-frozen-badge {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        display: none;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.92);
+        color: #0369a1;
+        font-size: 11px;
+        font-weight: 700;
+        z-index: 2;
+      }
+      .bankcard.frozen .bc-frozen-badge {
+        display: inline-flex;
+      }
+
+      /* ---------- Bottom dock ---------- */
+      .dock-wrap {
+        padding: 0 16px;
+      }
+      .dock {
+        position: sticky;
+        bottom: 14px;
+        z-index: 30;
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 4px;
+        padding: 8px;
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(14px);
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        box-shadow: 0 18px 40px -14px rgba(16, 24, 40, 0.3);
+      }
+      .tab {
+        appearance: none;
+        border: none;
+        background: transparent;
+        border-radius: 15px;
+        padding: 9px 4px;
+        display: grid;
+        justify-items: center;
+        gap: 3px;
+        cursor: pointer;
+        color: var(--ink-3);
+        font: inherit;
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 0.1px;
+        transition: background 0.18s ease, color 0.18s ease, transform 0.14s ease;
+        user-select: none;
+      }
+      .tab:hover {
+        color: var(--ink-2);
+        transform: translateY(-1px);
+      }
+      .tab.active {
+        background: var(--brand-tint);
+        color: var(--brand-ink);
+      }
+
+      /* ---------- Login ---------- */
+      .login-wrap {
+        min-height: 100dvh;
+        display: grid;
+        place-items: center;
+        padding: 32px 18px;
+      }
+      .login {
+        width: min(420px, 100%);
+      }
+      .login .brandrow {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 22px;
+      }
+      .brandimg {
+        width: 46px;
+        height: 46px;
+        border-radius: 14px;
+        object-fit: cover;
+        box-shadow: var(--sh-md);
+      }
+      .login h1 {
+        margin: 0 0 4px;
+        font-family: var(--font-display);
+        font-size: 22px;
+        letter-spacing: 0.1px;
+      }
+      .login .sub {
+        margin: 0 0 18px;
+        color: var(--ink-2);
+        font-size: 13.5px;
+      }
+      .form {
+        display: grid;
+        gap: 10px;
+      }
+      .error {
+        display: none;
+        margin-top: 12px;
+        padding: 10px 12px;
+        border-radius: var(--r-md);
+        border: 1px solid rgba(229, 72, 77, 0.3);
+        background: var(--bad-tint);
+        color: #b42318;
+        font-size: 13px;
+        font-weight: 500;
+      }
+      .error.show {
+        display: block;
+        animation: shake 0.35s ease both;
+      }
+      .smallnote {
+        margin-top: 14px;
+        color: var(--ink-3);
+        font-size: 11.5px;
+        line-height: 1.5;
+        text-align: center;
+      }
+
+      /* ---------- Toast / sheet / overlay ---------- */
+      .toast {
+        position: fixed;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 96px;
+        z-index: 70;
+        max-width: min(420px, calc(100% - 40px));
+        padding: 11px 18px;
+        border-radius: 999px;
+        background: var(--navy);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 500;
+        box-shadow: 0 18px 40px -12px rgba(10, 31, 43, 0.6);
+        display: none;
+        text-align: center;
+      }
+      .toast.show {
+        display: block;
+        animation: toastIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      }
+
+      .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 31, 43, 0.45);
+        backdrop-filter: blur(6px);
+        display: none;
+        z-index: 50;
+      }
+      .overlay.show {
+        display: block;
+        animation: fadeIn 0.18s ease both;
+      }
+      .sheet {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 60;
+        margin: 0 auto;
+        max-width: 480px;
+        border-radius: 24px 24px 0 0;
+        background: var(--surface);
+        box-shadow: 0 -24px 60px rgba(10, 31, 43, 0.35);
+        padding: 10px 18px 22px;
+        transform: translateY(12px);
+        animation: sheetUp 0.24s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      }
+      .grab {
+        width: 48px;
+        height: 5px;
+        border-radius: 999px;
+        background: var(--line);
+        margin: 4px auto 12px;
+      }
+      .sheet-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .sheet-title {
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 15px;
+      }
+      .sheet-x {
+        width: 34px;
+        height: 34px;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--ink-2);
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+      }
+      .sheet-x:hover {
+        color: var(--ink);
+      }
+      .receipt-hero {
+        margin-top: 14px;
+        display: grid;
+        justify-items: center;
+        gap: 8px;
+        text-align: center;
+      }
+      .check {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: var(--good-tint);
+        color: var(--good);
+        box-shadow: 0 0 0 8px rgba(11, 143, 99, 0.07);
+      }
+      .receipt-amt {
+        font-family: var(--font-display);
+        font-weight: 800;
+        font-size: 28px;
+        font-variant-numeric: tabular-nums;
+      }
+      .receipt-amt.in {
+        color: var(--good);
+      }
+      .receipt-amt.out {
+        color: var(--ink);
+      }
+
+      /* ---------- Misc ---------- */
+      .muted {
+        color: var(--ink-2);
+      }
+      .muted2 {
+        color: var(--ink-3);
+      }
+      .good {
+        color: var(--good);
+      }
+      .bad {
+        color: var(--bad);
+      }
+      .divider {
+        height: 1px;
+        background: var(--line-2);
+        margin: 14px 0;
+      }
+      .lift-in {
+        animation: liftIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      }
+
+      @keyframes liftIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px) scale(0.99);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      @keyframes sheetUp {
+        from {
+          transform: translateY(18px);
+          opacity: 0.6;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      @keyframes toastIn {
+        from {
+          opacity: 0;
+          transform: translate(-50%, 10px);
+        }
+        to {
+          opacity: 1;
+          transform: translate(-50%, 0);
+        }
+      }
+      @keyframes shake {
+        0% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-6px);
+        }
+        50% {
+          transform: translateX(6px);
+        }
+        75% {
+          transform: translateX(-4px);
+        }
+        100% {
+          transform: translateX(0);
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="mesh" aria-hidden="true"></div>
+    <div id="app"></div>
+
+    <script>
+      const app = document.getElementById("app");
+      const fmt = (n) => n.toLocaleString("en-US", { style: "currency", currency: "USD" });
+
+      // Demo login gate (client-side only; not secure)
+      const DEMO_EMAIL = "nifemiojokheta@gmail.com";
+      const DEMO_PASSWORD = "dattebayO1#";
+
+      // --- Deterministic mock data generation (reconciles exactly) ---
+      // Account started receiving funds in Jan 2025.
+      const TARGET_BALANCE = 47880.75;
+      const START = new Date("2025-01-01");
+      // Use "yesterday" as the effective end of history to keep today for UI actions.
+      const END = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      const RNG = ((seed) => () => (seed = (seed * 16807) % 2147483647) / 2147483647)(123456);
+
+      function generateTransactions() {
+        const tx = [];
+        let id = 1;
+        let inflow = 0,
+          outflow = 0;
+        const merchants = [
+          "Payroll",
+          "Client Transfer",
+          "Invoice Settlement",
+          "Utilities",
+          "Card Purchase",
+          "Wire Transfer",
+          "Refund",
+          "Subscription"
+        ];
+
+        // Keep the last 2 days reserved for fixed inflows.
+        const FIXED_2 = 2 * 86400000;
+        const effectiveEnd = new Date(Math.max(START.getTime(), END.getTime() - FIXED_2));
+        const days = Math.max(1, Math.floor((effectiveEnd - START) / 86400000));
+
+        // Smaller, more realistic activity count for a mobile banking history
+        const count = 160;
+        for (let i = 0; i < count; i++) {
+          const d = new Date(START.getTime() + Math.floor(RNG() * days) * 86400000);
+          const isIn = RNG() > 0.46;
+          // Regular activity between $20 and $200
+          const amt = Math.round((RNG() * 180 + 20) * 100) / 100;
+          if (isIn) inflow += amt;
+          else outflow += amt;
+          tx.push({
+            id: id++,
+            date: d,
+            type: isIn ? "in" : "out",
+            amount: amt,
+            desc: merchants[Math.floor(RNG() * merchants.length)]
+          });
+        }
+
+        // Fixed inflows
+        // - $12,000 credit on Feb 2, 2025
+        // - $15,960 credit (keep as last major inflow)
+        const febInflow = 12000.0;
+        const febDate = new Date("2025-02-02T10:15:00");
+        inflow += febInflow;
+        tx.push({ id: id++, date: febDate, type: "in", amount: febInflow, desc: "Incoming Transfer" });
+
+        const lastInflow = 15960.0;
+        // Put the big inflow earlier in the day, then add smaller transactions after it.
+        const d1 = new Date(END.getTime());
+        d1.setHours(9, 0, 0, 0); // yesterday 09:00
+        inflow += lastInflow;
+        tx.push({ id: id++, date: d1, type: "in", amount: lastInflow, desc: "Salary Payment" });
+
+        // Scatter smaller transactions AFTER the 15,960 (both receiving and spending)
+        const post = [
+          { mins: 18, type: "out", amount: 58.42, desc: "Card Purchase" },
+          { mins: 47, type: "out", amount: 123.9, desc: "Utilities" },
+          { mins: 83, type: "in", amount: 75.0, desc: "Refund" },
+          { mins: 126, type: "out", amount: 41.35, desc: "Subscription" },
+          { mins: 205, type: "out", amount: 199.99, desc: "Card Purchase" },
+          { mins: 320, type: "in", amount: 120.0, desc: "Client Transfer" },
+          { mins: 540, type: "out", amount: 88.6, desc: "Card Purchase" }
+        ];
+        for (const p of post) {
+          const dt = new Date(d1.getTime() + p.mins * 60 * 1000);
+          if (p.type === "in") inflow += p.amount;
+          else outflow += p.amount;
+          tx.push({ id: id++, date: dt, type: p.type, amount: p.amount, desc: p.desc });
+        }
+
+        // Reconcile exactly to target balance with an adjustment BEFORE the big inflow,
+        // so the 15,960 remains the last major inflow and we keep activity after it.
+        const currentBalance = Math.round((inflow - outflow) * 100) / 100;
+        const needed = Math.round((TARGET_BALANCE - currentBalance) * 100) / 100;
+        if (needed !== 0) {
+          const isIn = needed > 0;
+          const amt = Math.abs(needed);
+          const adjDate = new Date(d1.getTime() - 30 * 60 * 1000); // 30 mins before 15,960
+          if (isIn) inflow += amt;
+          else outflow += amt;
+          tx.push({ id: id++, date: adjDate, type: isIn ? "in" : "out", amount: amt, desc: "Balance Adjustment" });
+        }
+
+        tx.sort((a, b) => b.date - a.date);
+        return { tx, inflow, outflow };
+      }
+
+      const data = generateTransactions();
+
+      // --- Icons ---
+      const PATHS = {
+        home: '<path d="M3 10.8 12 3l9 7.8"/><path d="M5.5 9.6V20a1 1 0 0 0 1 1H10v-5.4h4V21h3.5a1 1 0 0 0 1-1V9.6"/>',
+        card: '<rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M2.5 10h19"/><path d="M6.5 15h4"/>',
+        send: '<path d="M7 17 17 7"/><path d="M8.5 7H17v8.5"/>',
+        recv: '<path d="M17 7 7 17"/><path d="M15.5 17H7V8.5"/>',
+        chart: '<path d="M4 19.5h16"/><path d="M6.5 15.5 10 11l3 2.2L17.5 7"/>',
+        user: '<circle cx="12" cy="8" r="3.6"/><path d="M5 20c1.4-3.4 4.1-5 7-5s5.6 1.6 7 5"/>',
+        bell: '<path d="M6 9a6 6 0 1 1 12 0c0 4 1.5 5.5 1.5 5.5H4.5S6 13 6 9"/><path d="M10.3 18.5a2 2 0 0 0 3.4 0"/>',
+        logout: '<path d="M14.5 4H18a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3.5"/><path d="M10 8l-4 4 4 4"/><path d="M6 12h9"/>',
+        eye: '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12"/><circle cx="12" cy="12" r="3"/>',
+        eyeOff: '<path d="m4 4 16 16"/><path d="M9.9 5.9A9.4 9.4 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a17.6 17.6 0 0 1-3.2 4"/><path d="M6.6 6.9A16.2 16.2 0 0 0 2.5 12S6 18.5 12 18.5c1.2 0 2.3-.2 3.4-.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
+        plus: '<path d="M12 5v14"/><path d="M5 12h14"/>',
+        bolt: '<path d="M13 2 4.5 13.5H11L9.5 22 19 10h-6.5L13 2z"/>',
+        bag: '<path d="M6.2 8h11.6l-1 12H7.2z"/><path d="M9 8a3 3 0 0 1 6 0"/>',
+        doc: '<path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M10 12h5M10 16h5"/>',
+        undo: '<path d="M9 14 4 9l5-5"/><path d="M4 9h9a7 7 0 1 1-7 7"/>',
+        repeat: '<path d="m17 2 4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>',
+        bank: '<path d="M3 9.5 12 4l9 5.5"/><path d="M5 11v7M9.5 11v7M14.5 11v7M19 11v7"/><path d="M3.5 20.5h17"/>',
+        search: '<circle cx="11" cy="11" r="6.5"/><path d="m20 20-3.5-3.5"/>',
+        copy: '<rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15H4.5A2.5 2.5 0 0 1 2 12.5v-8A2.5 2.5 0 0 1 4.5 2h8A2.5 2.5 0 0 1 15 4.5V5"/>',
+        snow: '<path d="M12 3v18"/><path d="m5 7.5 14 9M19 7.5l-14 9"/>',
+        gauge: '<path d="M4 14.5a8 8 0 1 1 16 0"/><path d="m12 14.5 3.5-3.5"/><path d="M3 19.5h18"/>',
+        check: '<path d="m5 12.5 5 5 9-10"/>',
+        chev: '<path d="m9 6 6 6-6 6"/>',
+        shield: '<path d="m12 3 7 2.8v5.4c0 4.4-3 8.3-7 9.8-4-1.5-7-5.4-7-9.8V5.8z"/><path d="m9 12 2 2 4-4"/>',
+        phone: '<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/>',
+        idcard: '<rect x="2.5" y="5" width="19" height="14" rx="3"/><circle cx="8.5" cy="11" r="2"/><path d="M5.5 16c.7-1.6 1.8-2.4 3-2.4s2.3.8 3 2.4"/><path d="M14.5 9.5h4M14.5 13h4"/>',
+        wallet: '<path d="M3 7a2 2 0 0 1 2-2h13a1 1 0 0 1 1 1v2"/><path d="M3 7v10a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1H5a2 2 0 0 1-2-2"/><circle cx="16.5" cy="13.5" r="1.1"/>'
+      };
+      function ic(name, size = 20) {
+        return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${PATHS[name] || ""}</svg>`;
+      }
+
+      const X_SVG =
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+
+      const CAT_ICON = {
+        Payroll: "bank",
+        "Salary Payment": "bank",
+        "Incoming Transfer": "recv",
+        "Wire Transfer": "bank",
+        "Client Transfer": "doc",
+        "Invoice Settlement": "doc",
+        Refund: "undo",
+        "Balance Adjustment": "repeat",
+        "Card Purchase": "bag",
+        Utilities: "bolt",
+        Subscription: "repeat"
+      };
+
+      // --- Tiny single-file "component" system ---
+      const state = {
+        route: "login", // 'login' | 'app'
+        tab: "home",
+        page: 1,
+        perPage: 10,
+        filter: "all",
+        q: "",
+        hideBalance: false,
+        cardFrozen: false,
+        focus: null,
+        login: { email: "", password: "", error: false },
+        pay: { to: "", amount: "", note: "" },
+        toast: "",
+        receipt: { open: false, txId: null }
+      };
+
+      function setState(patch) {
+        Object.assign(state, patch);
+        render();
+      }
+
+      function toast(msg) {
+        state.toast = msg;
+        render();
+        window.clearTimeout(toast._t);
+        toast._t = window.setTimeout(() => {
+          state.toast = "";
+          render();
+        }, 1800);
+      }
+
+      function cls(on, a, b = "") {
+        return on ? a : b;
+      }
+
+      function escapeHtml(s) {
+        return String(s ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function greeting() {
+        const h = new Date().getHours();
+        return h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
+      }
+
+      function dateLabel(d) {
+        const today = new Date();
+        const yest = new Date(Date.now() - 86400000);
+        const same = (a, b) => a.toDateString() === b.toDateString();
+        if (same(d, today)) return "Today";
+        if (same(d, yest)) return "Yesterday";
+        return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      }
+
+      // --- Sparkline: balance over the last 14 days ---
+      function sparkline() {
+        const DAYS = 14;
+        const nets = new Array(DAYS).fill(0);
+        const start14 = END.getTime() - (DAYS - 1) * 86400000;
+        for (const t of data.tx) {
+          const ts = t.date.getTime();
+          if (ts < start14) continue;
+          const idx = Math.min(
+            DAYS - 1,
+            Math.max(0, DAYS - 1 - Math.floor((END.getTime() - ts) / 86400000))
+          );
+          nets[idx] += t.type === "in" ? t.amount : -t.amount;
+        }
+        const bal = new Array(DAYS);
+        bal[DAYS - 1] = TARGET_BALANCE;
+        for (let i = DAYS - 2; i >= 0; i--) bal[i] = bal[i + 1] - nets[i + 1];
+
+        let min = Math.min(...bal),
+          max = Math.max(...bal);
+        if (max - min < 1e-6) {
+          min -= 1;
+          max += 1;
+        }
+        const W = 100,
+          H = 32,
+          P = 2;
+        const pts = bal.map((v, i) => {
+          const x = P + (i * (W - P * 2)) / (DAYS - 1);
+          const y = H - P - ((v - min) / (max - min)) * (H - P * 2);
+          return [x.toFixed(2), y.toFixed(2)];
+        });
+        const line = pts.map((p) => p.join(",")).join(" ");
+        const area = `M${pts[0][0]},${H} L${line.split(" ").join(" L")} L${pts[DAYS - 1][0]},${H} Z`;
+        return `
+          <svg class="hero-spark" viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="rgba(45,212,191,0.45)"/>
+                <stop offset="100%" stop-color="rgba(45,212,191,0)"/>
+              </linearGradient>
+            </defs>
+            <path d="${area}" fill="url(#sparkFill)"/>
+            <polyline points="${line}" fill="none" stroke="#2dd4bf" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+          </svg>`;
+      }
+
+      function TxItem(t) {
+        const sign = t.type === "in" ? "+" : "−";
+        const tone = t.type === "in" ? "in" : "out";
+        const icon = CAT_ICON[t.desc] || (t.type === "in" ? "recv" : "send");
+        return `
+          <div class="item btnlike" role="button" tabindex="0" data-action="tx" data-txid="${t.id}">
+            <div class="iicon ${tone}">${ic(icon, 19)}</div>
+            <div class="idesc">
+              <div class="name">${escapeHtml(t.desc)}</div>
+              <div class="meta">${dateLabel(t.date)} • ${t.type === "in" ? "Credit" : "Debit"}</div>
+            </div>
+            <div class="iamt ${tone}">${sign}${fmt(t.amount)}</div>
+          </div>`;
+      }
+
+      function DockButton(id, icon, label) {
+        return `
+          <button class="tab ${cls(state.tab === id, "active")}" type="button" data-action="tab" data-tab="${id}">
+            ${ic(icon, 21)}<span>${label}</span>
+          </button>`;
+      }
+
+      function LoginView() {
+        const { email, password, error } = state.login;
+        return `
+          <div class="login-wrap">
+            <div class="login lift-in">
+              <div class="brandrow">
+                <img class="brandimg" src="img/1.jfif" alt="G02bank" />
+                <div>
+                  <div class="display" style="font-weight:700; font-size:16px">G02bank</div>
+                  <div class="muted2" style="font-size:12px; margin-top:1px">Secure access</div>
+                </div>
+              </div>
+
+              <div class="panel" style="padding:20px">
+                <h1>Welcome back</h1>
+                <p class="sub">Sign in to continue to your account.</p>
+
+                <div class="form">
+                  <input class="input" name="email" placeholder="Email" autocomplete="username" value="${escapeHtml(email)}" />
+                  <input class="input" name="password" type="password" placeholder="Password" autocomplete="current-password" value="${escapeHtml(password)}" />
+                  <button class="btn primary wide" data-action="login" type="button">Sign in</button>
+                </div>
+
+                <div class="error ${cls(error, "show")}" role="alert">Incorrect email or password.</div>
+              </div>
+
+              <div class="smallnote">Forgot your password? Contact G02bank support.</div>
+            </div>
+          </div>`;
+      }
+
+      function HomePage() {
+        const recent = data.tx.slice(0, 5);
+        const shown = state.hideBalance ? "$ ••••••" : fmt(TARGET_BALANCE);
+        return `
+          <div class="page ${cls(state.tab === "home", "active")}" data-page="home">
+            <div class="hero">
+              <div class="hero-top">
+                <div class="hero-label">Total balance</div>
+                <button class="hero-eyebtn" type="button" data-action="eye" title="${state.hideBalance ? "Show balance" : "Hide balance"}">${ic(state.hideBalance ? "eyeOff" : "eye", 17)}</button>
+              </div>
+              <div class="hero-amt">${shown}</div>
+              <div class="hero-meta">
+                <span class="hero-chip"><span class="dot"></span>Checking •••• 4578</span>
+                <span class="hero-chip">USD</span>
+              </div>
+              ${sparkline()}
+            </div>
+
+            <div class="quick">
+              <div class="qbtn" data-action="quick" data-quick="send">
+                <div class="qicon t-brand">${ic("send", 19)}</div><div class="qtxt">Send</div>
+              </div>
+              <div class="qbtn" data-action="quick" data-quick="request">
+                <div class="qicon t-indigo">${ic("recv", 19)}</div><div class="qtxt">Request</div>
+              </div>
+              <div class="qbtn" data-action="quick" data-quick="bills">
+                <div class="qicon t-amber">${ic("doc", 19)}</div><div class="qtxt">Bills</div>
+              </div>
+              <div class="qbtn" data-action="quick" data-quick="deposit">
+                <div class="qicon t-sky">${ic("plus", 19)}</div><div class="qtxt">Add money</div>
+              </div>
+            </div>
+
+            <div class="section-head">
+              <h3>Recent activity</h3>
+              <button class="link" type="button" data-action="tab" data-tab="activity">See all</button>
+            </div>
+            <div class="list">${recent.map(TxItem).join("")}</div>
+          </div>`;
+      }
+
+      function CardsPage() {
+        return `
+          <div class="page ${cls(state.tab === "cards", "active")}" data-page="cards">
+            <div class="section-head"><h3>Cards</h3><span class="badge brand">Virtual</span></div>
+
+            <div class="bankcard ${cls(state.cardFrozen, "frozen")}">
+              <span class="bc-frozen-badge">${ic("snow", 13)} Frozen</span>
+              <div class="bc-top">
+                <div class="bc-chip"></div>
+                <div class="bc-visa">VISA</div>
+              </div>
+              <div class="bc-num">•••• •••• •••• 4821</div>
+              <div class="bc-bottom">
+                <div>
+                  <div class="bc-label">Card holder</div>
+                  <div class="bc-value">Lance Hughes</div>
+                </div>
+                <div>
+                  <div class="bc-label">Expires</div>
+                  <div class="bc-value">09/29</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section-head"><h3>Card controls</h3></div>
+            <div class="quick" style="grid-template-columns: repeat(2, 1fr); margin-top:0">
+              <div class="qbtn" data-action="quick" data-quick="freeze">
+                <div class="qicon t-sky">${ic("snow", 19)}</div><div class="qtxt">${state.cardFrozen ? "Unfreeze" : "Freeze"}</div>
+              </div>
+              <div class="qbtn" data-action="quick" data-quick="limits">
+                <div class="qicon t-indigo">${ic("gauge", 19)}</div><div class="qtxt">Limits</div>
+              </div>
+            </div>
+
+            <div class="section-head"><h3>Monthly spend limit</h3></div>
+            <div class="panel">
+              <div style="display:flex; justify-content:space-between; align-items:baseline">
+                <div class="display" style="font-weight:700; font-size:18px">$2,400</div>
+                <div class="muted2" style="font-size:12px">of $3,000</div>
+              </div>
+              <div style="height:8px; border-radius:999px; background:var(--line-2); margin-top:10px; overflow:hidden">
+                <div style="width:80%; height:100%; border-radius:999px; background:linear-gradient(90deg,#10b981,#059669)"></div>
+              </div>
+            </div>
+          </div>`;
+      }
+
+      function PayPage() {
+        const p = state.pay;
+        return `
+          <div class="page ${cls(state.tab === "pay", "active")}" data-page="pay">
+            <div class="section-head"><h3>Send money</h3></div>
+            <div class="panel">
+              <div class="form">
+                <input class="input" name="payTo" placeholder="Recipient (name or @handle)" value="${escapeHtml(p.to)}" />
+                <div class="money">
+                  <span class="cur">$</span>
+                  <input class="input" name="payAmount" placeholder="0.00" inputmode="decimal" value="${escapeHtml(p.amount)}" style="box-shadow:none; border:none" />
+                </div>
+                <div class="chips">
+                  <span class="chip" data-action="amt" data-amt="25">$25</span>
+                  <span class="chip" data-action="amt" data-amt="50">$50</span>
+                  <span class="chip" data-action="amt" data-amt="100">$100</span>
+                  <span class="chip" data-action="amt" data-amt="250">$250</span>
+                </div>
+                <input class="input" name="payNote" placeholder="Note (optional)" value="${escapeHtml(p.note)}" />
+                <button class="btn primary wide" data-action="pay" type="button">Send</button>
+              </div>
+            </div>
+            <div class="smallnote">Transfers shown here are simulated for UI practice.</div>
+          </div>`;
+      }
+
+      function DepositPage() {
+        const bankName = "G02bank";
+        const accountName = "Lance Hughes";
+        const accountNumber = "0274019836";
+        return `
+          <div class="page ${cls(state.tab === "deposit", "active")}" data-page="deposit">
+            <div class="section-head">
+              <h3>Add money</h3>
+              <button class="link" type="button" data-action="tab" data-tab="home">Back to home</button>
+            </div>
+            <div class="panel">
+              <div class="muted" style="font-size:13px; margin-bottom:12px">
+                Use the details below to deposit into your account.
+              </div>
+              <div class="kv">
+                <div class="kvrow">
+                  <div class="k">Bank</div>
+                  <div class="v"><span>${escapeHtml(bankName)}</span>
+                    <button class="btn sm" type="button" data-action="copy" data-copy="${escapeHtml(bankName)}">${ic("copy", 14)}</button>
+                  </div>
+                </div>
+                <div class="kvrow">
+                  <div class="k">Account name</div>
+                  <div class="v"><span>${escapeHtml(accountName)}</span>
+                    <button class="btn sm" type="button" data-action="copy" data-copy="${escapeHtml(accountName)}">${ic("copy", 14)}</button>
+                  </div>
+                </div>
+                <div class="kvrow">
+                  <div class="k">Account number</div>
+                  <div class="v"><span>${escapeHtml(accountNumber)}</span>
+                    <button class="btn sm" type="button" data-action="copy" data-copy="${escapeHtml(accountNumber)}">${ic("copy", 14)}</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="smallnote">Mock deposit details for UI practice.</div>
+          </div>`;
+      }
+
+      function ActivityPage() {
+        let rows = data.tx
+          .filter((t) => state.filter === "all" || t.type === state.filter)
+          .filter((t) => !state.q || t.desc.toLowerCase().includes(state.q));
+        const pages = Math.max(1, Math.ceil(rows.length / state.perPage));
+        const page = Math.min(state.page, pages);
+        const slice = rows.slice((page - 1) * state.perPage, page * state.perPage);
+
+        return `
+          <div class="page ${cls(state.tab === "activity", "active")}" data-page="activity">
+            <div class="section-head"><h3>Activity</h3></div>
+            <div class="filters">
+              <span class="pill ${cls(state.filter === "all", "active")}" data-action="filter" data-filter="all">All</span>
+              <span class="pill ${cls(state.filter === "in", "active")}" data-action="filter" data-filter="in">Credits</span>
+              <span class="pill ${cls(state.filter === "out", "active")}" data-action="filter" data-filter="out">Debits</span>
+              <span class="search">
+                ${ic("search", 16)}
+                <input class="input" name="search" placeholder="Search" value="${escapeHtml(state.q)}" />
+              </span>
+            </div>
+            <div class="list">${
+              slice.map(TxItem).join("") ||
+              `<div class="empty">No results<br /><span style="font-size:12px">Try a different search or filter</span></div>`
+            }</div>
+            <div class="pager">
+              <button class="btn sm" data-action="page" data-dir="-1" type="button">Prev</button>
+              <span class="muted2">Page ${page} / ${pages}</span>
+              <button class="btn sm" data-action="page" data-dir="1" type="button">Next</button>
+            </div>
+          </div>`;
+      }
+
+      function ProfilePage() {
+        return `
+          <div class="page ${cls(state.tab === "profile", "active")}" data-page="profile">
+            <div class="section-head"><h3>Profile</h3></div>
+
+            <div class="panel" style="display:flex; gap:14px; align-items:center">
+              <div class="avatar" style="width:54px; height:54px; border-radius:18px; font-size:18px">LH</div>
+              <div style="min-width:0">
+                <div class="display" style="font-weight:700; font-size:17px">Lance Hughes</div>
+                <div class="muted2" style="font-size:12.5px; margin-top:2px">lance.hughes@example.com</div>
+              </div>
+            </div>
+
+            <div class="section-head"><h3>Account details</h3></div>
+            <div class="rows">
+              <div class="row-item">
+                <div class="ri-icon">${ic("phone", 18)}</div>
+                <div class="ri-main">
+                  <div class="ri-title">Phone</div>
+                  <div class="ri-sub">(843) 534-1106</div>
+                </div>
+                <span class="chev">${ic("chev", 16)}</span>
+              </div>
+              <div class="row-item">
+                <div class="ri-icon">${ic("idcard", 18)}</div>
+                <div class="ri-main">
+                  <div class="ri-title">SSN</div>
+                  <div class="ri-sub">324‑84‑2141</div>
+                </div>
+                <span class="chev">${ic("chev", 16)}</span>
+              </div>
+            </div>
+
+            <div class="section-head"><h3>Preferences</h3></div>
+            <div class="rows">
+              <div class="row-item">
+                <div class="ri-icon t-brand">${ic("bell", 18)}</div>
+                <div class="ri-main">
+                  <div class="ri-title">Notifications</div>
+                  <div class="ri-sub">Enabled</div>
+                </div>
+                <span class="chev">${ic("chev", 16)}</span>
+              </div>
+              <div class="row-item">
+                <div class="ri-icon t-indigo">${ic("shield", 18)}</div>
+                <div class="ri-main">
+                  <div class="ri-title">Security</div>
+                  <div class="ri-sub">PIN required</div>
+                </div>
+                <span class="chev">${ic("chev", 16)}</span>
+              </div>
+              <div class="row-item">
+                <div class="ri-icon t-amber">${ic("wallet", 18)}</div>
+                <div class="ri-main">
+                  <div class="ri-title">Theme</div>
+                  <div class="ri-sub">Light</div>
+                </div>
+                <span class="chev">${ic("chev", 16)}</span>
+              </div>
+            </div>
+
+            <div style="margin-top:18px">
+              <button class="btn danger-ghost wide" data-action="logout" type="button">${ic("logout", 16)}&nbsp; Log out</button>
+            </div>
+            <div class="smallnote">Review and update your profile information.</div>
+          </div>`;
+      }
+
+      function DashboardView() {
+        const tx = data.tx.find((x) => x.id === state.receipt.txId) || null;
+        const reference = tx ? `G02-${String(tx.id).padStart(6, "0")}-${tx.date.getFullYear()}` : "";
+        const direction = tx ? (tx.type === "in" ? "Credit" : "Debit") : "";
+        const amountLine = tx ? `${tx.type === "in" ? "+" : "−"}${fmt(tx.amount)}` : "";
+        const when = tx
+          ? tx.date.toLocaleString("en-GB", { year: "numeric", month: "short", day: "2-digit", hour: "2-digit", minute: "2-digit" })
+          : "";
+
+        return `
+          <div class="shell">
+            <div class="appbar">
+              <div class="who">
+                <div class="avatar">LH</div>
+                <div class="hello">
+                  <div class="greet">${greeting()}, Lance</div>
+                  <div class="small">Personal account</div>
+                </div>
+              </div>
+              <div style="display:flex; gap:8px">
+                <button class="iconbtn" type="button" data-action="bell" title="Notifications">${ic("bell", 18)}</button>
+                <button class="iconbtn" type="button" data-action="logout" title="Log out">${ic("logout", 18)}</button>
+              </div>
+            </div>
+
+            <div class="pages">
+              ${HomePage()}
+              ${CardsPage()}
+              ${PayPage()}
+              ${DepositPage()}
+              ${ActivityPage()}
+              ${ProfilePage()}
+            </div>
+
+            <div class="dock-wrap">
+              <div class="dock">
+                ${DockButton("home", "home", "Home")}
+                ${DockButton("cards", "card", "Cards")}
+                ${DockButton("pay", "send", "Pay")}
+                ${DockButton("activity", "chart", "Activity")}
+                ${DockButton("profile", "user", "Profile")}
+              </div>
+            </div>
+
+            <div class="toast ${cls(!!state.toast, "show")}">${escapeHtml(state.toast)}</div>
+
+            <div class="overlay ${cls(state.receipt.open, "show")}" data-action="receipt-close" aria-hidden="true"></div>
+            ${
+              state.receipt.open && tx
+                ? `
+              <div class="sheet" role="dialog" aria-modal="true" aria-label="Transaction receipt">
+                <div class="grab" aria-hidden="true"></div>
+                <div class="sheet-head">
+                  <div>
+                    <div class="sheet-title">Transaction receipt</div>
+                    <div class="muted2" style="font-size:12px; margin-top:2px">${escapeHtml(reference)}</div>
+                  </div>
+                  <button class="sheet-x" type="button" data-action="receipt-close" title="Close">${X_SVG}</button>
+                </div>
+
+                <div class="receipt-hero">
+                  <div class="check">${ic("check", 26)}</div>
+                  <div class="receipt-amt ${tx.type === "in" ? "in" : "out"}">${escapeHtml(amountLine)}</div>
+                  <div class="badge ${tx.type === "in" ? "brand" : ""}">● Successful</div>
+                </div>
+
+                <div class="kv" style="margin-top:16px">
+                  <div class="kvrow"><div class="k">Type</div><div class="v">${escapeHtml(direction)}</div></div>
+                  <div class="kvrow"><div class="k">Description</div><div class="v" style="max-width:55%">${escapeHtml(tx.desc)}</div></div>
+                  <div class="kvrow"><div class="k">Date</div><div class="v">${escapeHtml(when)}</div></div>
+                  <div class="kvrow"><div class="k">Reference</div><div class="v">${escapeHtml(reference)}</div></div>
+                </div>
+
+                <div class="smallnote">This receipt is generated for UI practice.</div>
+              </div>
+            `
+                : ""
+            }
+          </div>`;
+      }
+
+      function App() {
+        if (state.route === "login") return LoginView();
+        return DashboardView();
+      }
+
+      function render() {
+        app.innerHTML = App();
+        // Restore focus hints
+        if (state.route === "login") {
+          const firstInput = app.querySelector('input[name="email"]');
+          if (firstInput && document.activeElement === document.body) firstInput.focus();
+        } else if (state.focus) {
+          const el = app.querySelector(`input[name="${state.focus}"]`);
+          if (el) {
+            el.focus();
+            const len = el.value.length;
+            try {
+              el.setSelectionRange(len, len);
+            } catch {}
+          }
+          state.focus = null;
+        }
+      }
+
+      // Single event listener (event delegation)
+      app.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-action]");
+        if (!btn) return;
+        const action = btn.dataset.action;
+
+        if (action === "login") {
+          const typedEmail = state.login.email.trim().toLowerCase();
+          const typedPassword = state.login.password.trim();
+          const ok = typedEmail === DEMO_EMAIL.toLowerCase() && typedPassword === DEMO_PASSWORD;
+          if (!ok) {
+            state.login.error = true;
+            render();
+            return;
+          }
+          state.login.error = false;
+          state.route = "app";
+          state.tab = "home";
+          render();
+          return;
+        }
+
+        if (action === "logout") {
+          state.route = "login";
+          state.login.password = "";
+          state.login.error = false;
+          render();
+          return;
+        }
+
+        if (action === "tab") {
+          state.tab = btn.dataset.tab;
+          render();
+          return;
+        }
+
+        if (action === "eye") {
+          state.hideBalance = !state.hideBalance;
+          render();
+          return;
+        }
+
+        if (action === "bell") {
+          return toast("You're all caught up — no new alerts");
+        }
+
+        if (action === "amt") {
+          state.pay.amount = btn.dataset.amt || "";
+          state.focus = "payAmount";
+          render();
+          return;
+        }
+
+        if (action === "quick") {
+          const q = btn.dataset.quick;
+          if (q === "send") {
+            state.tab = "pay";
+            render();
+            return;
+          }
+          if (q === "request") return toast("Request link created");
+          if (q === "bills") return toast("Bills center opened");
+          if (q === "deposit") {
+            state.tab = "deposit";
+            render();
+            return;
+          }
+          if (q === "freeze") {
+            state.cardFrozen = !state.cardFrozen;
+            render();
+            return toast(state.cardFrozen ? "Card frozen (simulated)" : "Card unfrozen (simulated)");
+          }
+          if (q === "limits") return toast("Limits updated (simulated)");
+          return toast("Action completed");
+        }
+
+        if (action === "filter") {
+          state.filter = btn.dataset.filter;
+          state.page = 1;
+          render();
+          return;
+        }
+
+        if (action === "page") {
+          const dir = Number(btn.dataset.dir || "0");
+          state.page = Math.max(1, state.page + dir);
+          render();
+          return;
+        }
+
+        if (action === "pay") {
+          const to = state.pay.to.trim();
+          const amt = Number(state.pay.amount.trim());
+          if (!to || !Number.isFinite(amt) || amt <= 0) return toast("Enter recipient and amount");
+          state.pay.amount = "";
+          state.pay.note = "";
+          render();
+          return toast(`Sent ${fmt(amt)} to ${to}`);
+        }
+
+        if (action === "tx") {
+          const id = Number(btn.dataset.txid);
+          if (!Number.isFinite(id)) return;
+          state.receipt.open = true;
+          state.receipt.txId = id;
+          render();
+          return;
+        }
+
+        if (action === "receipt-close") {
+          state.receipt.open = false;
+          render();
+          return;
+        }
+
+        if (action === "copy") {
+          const text = btn.dataset.copy ?? "";
+          if (!text) return;
+          if (navigator.clipboard?.writeText) {
+            navigator.clipboard.writeText(text).then(
+              () => toast("Copied"),
+              () => toast("Copy failed")
+            );
+          } else {
+            toast("Copy not supported");
+          }
+          return;
+        }
+      });
+
+      app.addEventListener("input", (e) => {
+        const el = e.target;
+        if (!(el instanceof HTMLInputElement)) return;
+        const name = el.getAttribute("name");
+        if (!name) return;
+
+        if (state.route === "login") {
+          if (name === "email") state.login.email = el.value;
+          if (name === "password") state.login.password = el.value;
+          state.login.error = false;
+          // Do NOT re-render on each keystroke while typing login fields,
+          // otherwise the cursor will jump. We only render again on submit.
+          return;
+        }
+
+        if (name === "search") {
+          state.q = el.value.toLowerCase();
+          state.page = 1;
+          state.focus = "search";
+          return render();
+        }
+
+        if (name === "payTo") state.pay.to = el.value;
+        if (name === "payAmount") state.pay.amount = el.value;
+        if (name === "payNote") state.pay.note = el.value;
+      });
+
+      app.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && state.receipt.open) {
+          state.receipt.open = false;
+          render();
+          return;
+        }
+        if (state.route !== "login") return;
+        if (e.key !== "Enter") return;
+        const focused = document.activeElement;
+        if (!(focused instanceof HTMLInputElement)) return;
+        if (focused.getAttribute("name") !== "password") return;
+        const btn = app.querySelector('[data-action="login"]');
+        btn?.click();
+      });
+
+      render();
+    </script>
+  </body>
+</html>
